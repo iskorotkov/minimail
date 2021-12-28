@@ -53,6 +53,10 @@ func main() {
 	// GetMessages - Возвращает список всех сообщений
 	e.GET("/api/messages", c.GetMessages)
 
+	// Swagger
+	e.Static("/", "static/swagger-ui")
+	e.File("/api/swagger.yml", ".docs/api/openapi.yaml")
+
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
 }
