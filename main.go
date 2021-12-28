@@ -16,7 +16,7 @@ func main() {
 	e := echo.New()
 
 	if err := godotenv.Load(); err != nil {
-		e.Logger.Fatal(err)
+		e.Logger.Warn(err)
 	}
 
 	db, err := gorm.Open(postgres.Open(os.Getenv("CONN_STRING")))
