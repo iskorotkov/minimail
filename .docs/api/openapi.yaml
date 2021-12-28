@@ -1,0 +1,166 @@
+openapi: 3.0.1
+info:
+  title: Мини-Почта
+  version: 1.0.0
+servers:
+- url: https://minimail.web.shgk.me/api
+tags:
+- description: Сообщения Мини-Почты
+  name: Messages
+paths:
+  /messages:
+    get:
+      description: Возвращает список всех сообщений, отсортированных по убыванию по
+        количеству хлопков
+      operationId: getMessages
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Message'
+                type: array
+          description: Успешно получен список сообщений
+      summary: Возвращает список всех сообщений
+      tags:
+      - Messages
+    post:
+      operationId: addMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMessageDTO'
+        description: Объект с данными нового сообщения
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Сообщение успешно создано
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Ошибка валидации
+      summary: Создаёт новое сообщение
+      tags:
+      - Messages
+      x-codegen-request-body-name: body
+  /messages/{messageId}:
+    get:
+      operationId: getMessage
+      parameters:
+      - description: ID сообщения
+        in: path
+        name: messageId
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Сообщение найдено
+        "404":
+          content: {}
+          description: Сообщение с таким ID не найдено
+      summary: Возвращает сообщение по ID
+      tags:
+      - Messages
+  /messages/{messageId}/claps:
+    post:
+      operationId: clapMessage
+      parameters:
+      - description: ID сообщения
+        in: path
+        name: messageId
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "201":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ClapsCount'
+          description: Хлопок добавлен
+        "404":
+          content: {}
+          description: Сообщение с таким ID не найдено
+      summary: Увеличивает количество хлопков сообщения на 1
+      tags:
+      - Messages
+components:
+  schemas:
+    NewMessageDTO:
+      properties:
+        author:
+          description: Имя автора сообщения
+          example: Sender Name
+          type: string
+        message:
+          description: Текст сообщения
+          example: Lorem ipsum...
+          type: string
+      required:
+      - author
+      - message
+      type: object
+    Message:
+      example:
+        author: Sender Name
+        id: 1
+        message: Lorem ipsum...
+        claps: 42
+      properties:
+        id:
+          description: ID сообщения
+          example: 1
+          format: int32
+          type: integer
+        author:
+          description: Имя автора сообщения
+          example: Sender Name
+          type: string
+        message:
+          description: Текст сообщения
+          example: Lorem ipsum...
+          type: string
+        claps:
+          description: Количество хлопков
+          example: 42
+          format: int32
+          type: integer
+      required:
+      - author
+      - claps
+      - id
+      - message
+      type: object
+    ClapsCount:
+      example:
+        count: 42
+      properties:
+        count:
+          description: Количество хлопков
+          example: 42
+          format: int32
+          type: integer
+      type: object
+    Error:
+      properties:
+        message:
+          description: Сообщение ошибки
+          example: Автор не должен быть длиннее 30 символов
+          type: string
+      type: object
+x-original-swagger-version: "2.0"
