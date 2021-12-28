@@ -85,7 +85,7 @@ func (c *Container) GetMessage(ctx echo.Context) error {
 // GetMessages - Возвращает список всех сообщений
 func (c *Container) GetMessages(ctx echo.Context) error {
 	var messages []models.Message
-	if err := c.db.Find(&messages).Error; err != nil {
+	if err := c.db.Order("id").Find(&messages).Error; err != nil {
 		return echo.ErrInternalServerError.SetInternal(err)
 	}
 
