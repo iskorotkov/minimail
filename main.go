@@ -1,6 +1,8 @@
 package main
 
 import (
+	"html/template"
+	"io"
 	"os"
 
 	"github.com/iskorotkov/minimail/handlers"
@@ -12,8 +14,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type Renderer struct {
+	templates *template.Template
+}
+
+func (r Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return r.templates.ExecuteTemplate(w, name, data)
+}
+
 func main() {
 	e := echo.New()
+	e.Renderer = Renderer{
+		templates: template.Must(template.ParseGlob("static/templates/*.html")),
+	}
 
 	if err := godotenv.Load(); err != nil {
 		e.Logger.Warn(err)
@@ -34,28 +47,41 @@ func main() {
 	}
 
 	// Middleware
-	e.Use(middleware.NonWWWRedirect())
-	e.Use(middleware.RemoveTrailingSlash())
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
-	e.Use(middleware.Gzip())
+	e.Use(
+		middleware.NonWWWRedirect(),
+		middleware.Logger(),
+		middleware.Recover(),
+		middleware.Gzip(),
+	)
+
+	apiGroup := e.Group("/api",
+		middleware.CORS(),
+	)
 
 	// AddMessage - Создаёт новое сообщение
-	e.POST("/api/messages", c.AddMessage)
+	apiGroup.POST("/messages", c.AddMessage)
 
 	// ClapMessage - Увеличивает количество хлопков сообщения на 1
-	e.POST("/api/messages/:messageId/claps", c.ClapMessage)
+	apiGroup.POST("/messages/:messageId/claps", c.ClapMessage)
 
 	// GetMessage - Возвращает сообщение по ID
-	e.GET("/api/messages/:messageId", c.GetMessage)
+	apiGroup.GET("/messages/:messageId", c.GetMessage)
 
 	// GetMessages - Возвращает список всех сообщений
-	e.GET("/api/messages", c.GetMessages)
+	apiGroup.GET("/messages", c.GetMessages)
 
 	// Swagger
-	e.Static("/", "static/swagger-ui")
-	e.File("/api/swagger.yml", ".docs/api/openapi.yaml")
+	swagger := e.Group("/swagger")
+	swagger.Static("/", "static/swagger-ui")
+	swagger.File("/openapi.yml", ".docs/api/openapi.yaml")
+
+	// Assets
+	e.Static("/css", "static/common/css")
+
+	// Frontend based on templates
+	simple := e.Group("/simple")
+	simple.GET("/", c.GetMessagesPage)
+	simple.GET("/:messageId", c.GetMessagePage)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
