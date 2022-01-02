@@ -1,13 +1,15 @@
 package handlers
 
-import "gorm.io/gorm"
+import (
+	"github.com/iskorotkov/minimail/services"
+)
 
 // Container will hold all dependencies for your application.
 type Container struct {
-	db *gorm.DB
+	service services.Messages
 }
 
 // NewContainer returns an empty or an initialized container for your handlers.
-func NewContainer(db *gorm.DB) (Container, error) {
-	return Container{db: db}, nil
+func NewContainer(service services.Messages) (Container, error) {
+	return Container{service: service}, nil
 }

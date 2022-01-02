@@ -7,6 +7,7 @@ import (
 
 	"github.com/iskorotkov/minimail/handlers"
 	"github.com/iskorotkov/minimail/models"
+	"github.com/iskorotkov/minimail/services"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -41,7 +42,12 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
-	c, err := handlers.NewContainer(db)
+	service, err := services.NewMessages(db)
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+
+	c, err := handlers.NewContainer(service)
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -80,8 +86,10 @@ func main() {
 
 	// Frontend based on templates
 	simple := e.Group("/simple")
+	simple.POST("/", c.AddMessagePage)
+	simple.POST("/messages/:messageId/claps", c.ClapMessagePage)
 	simple.GET("/", c.GetMessagesPage)
-	simple.GET("/:messageId", c.GetMessagePage)
+	simple.GET("/messages/:messageId", c.GetMessagePage)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

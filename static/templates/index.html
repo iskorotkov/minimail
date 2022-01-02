@@ -14,26 +14,28 @@
     <div class="d-flex flex-column bg-light min-vh-100">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-          <a class="navbar-brand mx-auto" href="/simple/">📨 Мини-почта 📨</a>
+          <a class="navbar-brand mx-auto" href="./">📨 Мини-почта 📨</a>
         </div>
       </nav>
 
       <main class="container flex-fill my-3">
-        <form class="card border-secondary mb-3" data-test="send-form">
+        <form class="card border-secondary mb-3" data-test="send-form" method="post">
           <fieldset>
             <legend class="card-header h5 border-secondary bg-dark text-light">📩 Отправить письмо</legend>
             <div class="card-body">
+              {{if ne .Error ""}}
               <div class="mb-3" data-test="send-alert">
-                <div class="alert alert-danger">Текст ошибки</div>
+                <div class="alert alert-danger">{{.Error}}</div>
               </div>
-
-              <div class="mb-3" data-test="send-alert">
-                <div class="alert alert-warning">Загрузка...</div>
-              </div>
-
+              {{else if .Sent}}
               <div class="mb-3" data-test="send-alert">
                 <div class="alert alert-success">Сообщение отправлено</div>
               </div>
+              {{else if false}}
+              <div class="mb-3" data-test="send-alert">
+                <div class="alert alert-warning">Загрузка...</div>
+              </div>
+              {{end}}
 
               <div class="mb-3">
                 <label for="sender" class="form-label">От кого:</label>
@@ -53,19 +55,24 @@
         </form>
 
         <ul class="list-unstyled">
-          {{range $message := .}}
+          {{range $message := .Messages}}
           <li class="mb-3">
             <article class="card" data-test="message">
               <div class="card-body">
                 <header class="card-title d-flex">
                   <div class="text-muted" data-test="message-author">{{$message.Author}}</div>
-                  <a href="./{{$message.Id}}" class="card-link ms-auto" data-test="message-open">Открыть ↗️</a>
+                  <a href="./messages/{{$message.Id}}" class="card-link ms-auto" data-test="message-open">Открыть ↗️</a>
                 </header>
 
                 <div class="card-text" data-test="message-text">{{$message.Message}}</div>
 
                 <div class="d-flex">
-                  <form class="ms-auto" data-test="message-clap-form">
+                  <form
+                    class="ms-auto"
+                    data-test="message-clap-form"
+                    method="post"
+                    action="./messages/{{$message.Id}}/claps?page=index"
+                  >
                     <button class="btn">👏🏻 <span data-test="clap-count">{{$message.Claps}}</span></button>
                   </form>
                 </div>
