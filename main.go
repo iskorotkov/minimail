@@ -4,6 +4,9 @@ import (
 	"html/template"
 	"io"
 	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/iskorotkov/minimail/handlers"
 	"github.com/iskorotkov/minimail/models"
@@ -90,6 +93,23 @@ func main() {
 	simple.POST("/messages/:messageId/claps", c.ClapMessagePage)
 	simple.GET("/", c.GetMessagesPage)
 	simple.GET("/messages/:messageId", c.GetMessagePage)
+
+	// Frontend based on AJAX
+	ajax := e.Group("/ajax")
+	// ajax.Static("/", "static/ajax")
+	// ajax.Static("/messages/*", "static/ajax/messages")
+	// ajax.File("/messages/*.html", "static/ajax/messages/index.html")
+
+	r := regexp.MustCompile("/messages/[0-9]*$")
+	ajax.GET("/*", func(c echo.Context) error {
+		requestPath := c.Request().URL.Path
+		if r.MatchString(requestPath) {
+			return c.File("static/ajax/messages/index.html")
+		}
+
+		filePath := filepath.Join("static/ajax", strings.TrimPrefix(requestPath, "/ajax"))
+		return c.File(filePath)
+	})
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

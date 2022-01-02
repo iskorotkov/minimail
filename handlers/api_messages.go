@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -17,7 +18,12 @@ func (c *Container) AddMessage(ctx echo.Context) error {
 
 	message, err := c.service.Add(dto)
 	if err != nil {
-		return echo.ErrInternalServerError.SetInternal(err)
+		var httpErr *echo.HTTPError
+		if errors.As(err, &httpErr) {
+			return ctx.JSON(http.StatusUnprocessableEntity, models.Error{Message: httpErr.Internal.Error()})
+		}
+
+		return err
 	}
 
 	return ctx.JSON(http.StatusCreated, message)
