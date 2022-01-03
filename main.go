@@ -96,14 +96,10 @@ func main() {
 
 	// Frontend based on AJAX
 	ajax := e.Group("/ajax")
-	// ajax.Static("/", "static/ajax")
-	// ajax.Static("/messages/*", "static/ajax/messages")
-	// ajax.File("/messages/*.html", "static/ajax/messages/index.html")
-
-	r := regexp.MustCompile("/messages/[0-9]*$")
+	ajaxMessageHTML := regexp.MustCompile("/messages/[0-9]*$")
 	ajax.GET("/*", func(c echo.Context) error {
 		requestPath := c.Request().URL.Path
-		if r.MatchString(requestPath) {
+		if ajaxMessageHTML.MatchString(requestPath) {
 			return c.File("static/ajax/messages/index.html")
 		}
 
