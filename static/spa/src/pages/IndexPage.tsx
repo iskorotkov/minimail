@@ -41,11 +41,7 @@ export const IndexPage = () => {
       <Header />
 
       <main className='container flex-fill my-3'>
-        <MessageForm
-          onAdded={() => {
-            // TODO: Do something.
-          }}
-        />
+        <MessageForm onAdded={updateList} />
 
         <MessageList>
           {messages?.map(_ => (
