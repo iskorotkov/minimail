@@ -70,24 +70,33 @@ const renderMessages = (
     const messageNode = messageTemplate.content.cloneNode(true)
 
     /** @type {HTMLDivElement | null} */
-    const authorNode = messageNode.querySelector('[data-test="message-author"')
+    const authorNode = messageNode.querySelector('[data-test="message-author"]')
     if (authorNode) {
       authorNode.innerText = message.author
     }
 
     /** @type {HTMLDivElement | null} */
-    const textNode = messageNode.querySelector('[data-test="message-text"')
+    const textNode = messageNode.querySelector('[data-test="message-text"]')
     if (textNode) {
       textNode.innerText = message.message
     }
 
     /** @type {HTMLSpanElement | null} */
-    const clapsNode = messageNode.querySelector('[data-test="clap-count"')
+    const clapsNode = messageNode.querySelector('[data-test="clap-count"]')
     if (clapsNode) {
       clapsNode.innerText = message.claps.toString()
-      clapsNode.parentElement?.addEventListener('click', (/** @type {MouseEvent} */ e) => {
+
+      /** @type {HTMLButtonElement | null} */
+      const clapButton = messageNode.querySelector('button')
+      if (!clapButton) {
+        throw new Error('clap button is null')
+      }
+
+      clapButton.addEventListener('click', (/** @type {MouseEvent} */ e) => {
         e.preventDefault()
         e.stopPropagation()
+
+        clapButton.disabled = true
 
         const currentClapsCount = parseInt(clapsNode.innerText)
         clapsNode.innerText = (currentClapsCount + 1).toString()
@@ -95,11 +104,12 @@ const renderMessages = (
         addClap(message.id)
           .then(() => onCreated?.call(undefined))
           .catch(e => console.error(e))
+          .finally(() => (clapButton.disabled = false))
       })
     }
 
     /** @type {HTMLLinkElement | null} */
-    const openLink = messageNode.querySelector('[data-test="message-open"')
+    const openLink = messageNode.querySelector('[data-test="message-open"]')
     if (openLink) {
       openLink.href = `./messages/${message.id}`
     }

@@ -55,12 +55,15 @@ const recreateCard = (/** @type {() => void | undefined} */ onCreated) =>
           e.preventDefault()
           e.stopPropagation()
 
+          elements.clapButton.disabled = true
+
           const currentClapsCount = parseInt(elements.clapCount.innerText)
           elements.clapCount.innerText = (currentClapsCount + 1).toString()
 
           addClap(message.id)
             .then(() => onCreated?.call(undefined))
             .catch(e => console.error(e))
+            .finally(() => (elements.clapButton.disabled = false))
         })
 
         return
