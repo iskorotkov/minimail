@@ -3,11 +3,11 @@ WORKDIR /src
 
 RUN npm i -g pnpm
 
-COPY ["package.json", "pnpm-lock.yaml", "./"]
+COPY ["client-spa/package.json", "client-spa/pnpm-lock.yaml", "./"]
 RUN pnpm i
 
-COPY ["./", "./"]
-RUN pnpm run build
+COPY ["./client-spa", "./"]
+RUN REACT_APP_API_URL=http://localhost:8080/api pnpm run build
 
 FROM node:17-alpine3.14 as run
 WORKDIR /app

@@ -1,9 +1,10 @@
 services:
   server:
     image: minimail-server
+    restart: on-failure
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: server/Dockerfile
     environment:
       CONN_STRING: dbname=postgres user=postgres password=postgres host=postgres port=5432
     ports:
@@ -11,14 +12,16 @@ services:
 
   client-spa:
     image: minimail-client-spa
+    restart: on-failure
     build:
-      context: ./static/spa
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: client-spa/Dockerfile
     ports:
       - "3000:3000"
 
   postgres:
     image: postgres:14
+    restart: on-failure
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

@@ -84,11 +84,11 @@ func (c *Container) GetMessagesPage(ctx echo.Context) error {
 }
 
 func (c *Container) redirectToIndex(ctx echo.Context) error {
-	return ctx.Redirect(http.StatusSeeOther, "/simple/")
+	return ctx.Redirect(http.StatusSeeOther, "/templates/")
 }
 
 func (c *Container) redirectToMessage(ctx echo.Context, id int) error {
-	return ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/simple/messages/%d", id))
+	return ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/templates/messages/%d", id))
 }
 
 func (c *Container) renderMessagesTemplate(ctx echo.Context, messages []models.Message, err error) error {

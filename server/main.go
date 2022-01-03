@@ -82,17 +82,17 @@ func main() {
 	// Swagger
 	swagger := e.Group("/swagger")
 	swagger.Static("/", "static/swagger-ui")
-	swagger.File("/openapi.yml", ".docs/api/openapi.yaml")
+	swagger.File("/openapi.yml", "openapi.yml")
 
 	// Assets
 	e.Static("/css", "static/common/css")
 
 	// Frontend based on templates
-	simple := e.Group("/simple")
-	simple.POST("/", c.AddMessagePage)
-	simple.POST("/messages/:messageId/claps", c.ClapMessagePage)
-	simple.GET("/", c.GetMessagesPage)
-	simple.GET("/messages/:messageId", c.GetMessagePage)
+	templates := e.Group("/templates")
+	templates.POST("/", c.AddMessagePage)
+	templates.POST("/messages/:messageId/claps", c.ClapMessagePage)
+	templates.GET("/", c.GetMessagesPage)
+	templates.GET("/messages/:messageId", c.GetMessagePage)
 
 	// Frontend based on AJAX
 	ajax := e.Group("/ajax")

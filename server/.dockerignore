@@ -1,0 +1,9 @@
+.vs/
+.vscode/
+.idea/
+
+node_modules/
+build/
+
+*.md
+.env
