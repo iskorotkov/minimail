@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/joho/godotenv v1.4.0
-	github.com/labstack/echo/v4 v4.6.1
+	github.com/labstack/echo/v4 v4.9.0
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.4
 )
